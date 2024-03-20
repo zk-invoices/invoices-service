@@ -35,59 +35,6 @@ app.use(morgan('tiny'));
 // Apply routes before error handling
 app.use('/', root);
 
-app.get('/cache/discovery/invoices', (req, res) => {
-  const invoicesCachePath = path.join(__dirname, '../../cache/invoicescache');
-
-  return readdir(invoicesCachePath, (err, filesList) => {
-    if (err) {
-      return res
-        .status(500)
-        .json({ error: { message: 'Something went wrong' } });
-    }
-
-    const files = filesList
-      .filter((file: string) => {
-        return !file.endsWith('.header') && file.indexOf('-pk-') < 0;
-      })
-      .map((name) => {
-        return { name, type: 'string' };
-      });
-
-    return res.json({ files });
-  });
-});
-
-app.get('/cache/discovery/provider', (req, res) => {
-  const providerCachePath = path.join(__dirname, '../../cache/providercache');
-
-  return readdir(providerCachePath, (err, filesList) => {
-    if (err) {
-      return res
-        .status(500)
-        .json({ error: { message: 'Something went wrong' } });
-    }
-
-    const files = filesList
-      .filter((file: string) => {
-        return !file.endsWith('.header') && file.indexOf('-pk-') < 0;
-      })
-      .map((name) => {
-        return { name, type: 'string' };
-      });
-
-    return res.json({ files });
-  });
-});
-
-app.use(
-  '/cache/invoices',
-  express.static(path.join(__dirname, '../../cache/invoicescache'))
-);
-app.use(
-  '/cache/provider',
-  express.static(path.join(__dirname, '../../cache/providercache'))
-);
-
 const loginHandler: RequestHandler = async (req, res) => {
   const { data, publicKey, signature } = req.body;
 
