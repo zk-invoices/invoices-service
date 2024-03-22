@@ -11,5 +11,5 @@
     "resolveJsonModule": true
   },
   "include": ["src/tests/**/*.ts"],
-  "files": ["src/index.ts"]
+  "files": ["src/index.ts", "src/types/express/index.d.ts"]
 }

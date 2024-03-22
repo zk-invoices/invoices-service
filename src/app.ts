@@ -1,4 +1,3 @@
-import { readdir } from 'fs';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express, { RequestHandler } from 'express';
@@ -8,12 +7,16 @@ import morgan from 'morgan';
 // import config from './config';
 import errorHandler from './middleware/errorHandler';
 import fourOhFour from './middleware/fourOhFour';
+
 import root from './routes/root';
+import userRoutes from './routes/user';
+
 import { initializeApp, applicationDefault } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 
 import Client from 'mina-signer';
-import path from 'path';
+import { getFirestore } from 'firebase-admin/firestore';
+
 const client = new Client({ network: 'testnet' });
 
 const app = express();
@@ -32,8 +35,17 @@ app.use(cors({}));
 app.use(helmet());
 app.use(morgan('tiny'));
 
+const firebaseMiddleware: RequestHandler = (req, res, next) => {
+  req.firebase = firebaseApp;
+  req.firestore = getFirestore(firebaseApp);
+
+  return next();
+};
+app.use(firebaseMiddleware);
+
 // Apply routes before error handling
 app.use('/', root);
+app.use('/user', userRoutes);
 
 const loginHandler: RequestHandler = async (req, res) => {
   const { data, publicKey, signature } = req.body;
